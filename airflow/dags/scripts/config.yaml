@@ -1,0 +1,44 @@
+database:
+  user: user
+  password: password
+  host: host
+  port: 5432
+  database: postgres
+
+api:
+  base_url: https://www.ebi.ac.uk/chembl/api/data
+  page_params: '?limit=1000&offset={}'
+  concurrent_requests: 125
+  retries: 3
+  delay: 5
+
+chembl:
+  chembl_id_lookup:
+    file: chembl_id_lookup.json
+    params: '&entity_type=COMPOUND&status=ACTIVE'
+    json: chembl_id_lookups
+  molecule:
+    file: molecule.json
+    params: '&only=molecule_chembl_id,molecule_type,molecule_properties,molecule_structures'
+    json: molecules
+
+model_mapping:
+  chembl_id_lookup: ChemblIdLookup
+  molecule: Molecule
+
+aws:
+  aws_access_key_id: key_id
+  aws_secret_access_key: access_key
+  aws_session_token: seesion_key
+  aws_region: us-east-2
+
+fingerprint_similarity:
+  bucket_name: bucket
+  input_prefix: final_folder
+  fingerprints:
+    fingerprints_prefix: final_folder/fingerprints1/
+    chunk_size: 100000
+    fps_bits: 2048
+    fps_mol_radius: 2
+  similarities:
+    similarities_prefix: final_folder/similarities1/
