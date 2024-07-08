@@ -36,9 +36,9 @@ fingerprint_similarity:
   bucket_name: bucket
   input_prefix: final_folder
   fingerprints:
-    fingerprints_prefix: final_folder/fingerprints1/
+    fingerprints_prefix: final_folder/fingerprints/
     chunk_size: 100000
     fps_bits: 2048
     fps_mol_radius: 2
   similarities:
-    similarities_prefix: final_folder/similarities1/
+    similarities_prefix: final_folder/similarities/

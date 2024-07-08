@@ -37,7 +37,7 @@ class MorganFingerprintCalculator:
 
     @classmethod
     def process_fingerprints(cls, df_part):
-        logging.info('Processing fingerprints...')
+        logging.info('Processing fingerprints')
         if 'canonical_smiles' not in df_part.columns:
             logging.error("The 'canonical_smiles' column is missing from the DataFrame.")
             raise ValueError("The 'canonical_smiles' column is missing from the DataFrame.")

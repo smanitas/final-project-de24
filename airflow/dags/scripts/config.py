@@ -1,8 +1,12 @@
+import os
 import yaml
 
 
 class Config:
-    def __init__(self, config_file='config.yaml'):
+    def __init__(self, config_file=None):
+        if config_file is None:
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            config_file = os.path.join(base_dir, 'config.yaml')
         self.config = self.load_config(config_file)
 
     @staticmethod

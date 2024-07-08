@@ -29,10 +29,10 @@ class MorganFingerprintProcessor:
 
     def compute_and_store_fingerprints(self):
         try:
-            logging.info('Connecting to the database...')
+            logging.info('Connecting to the database')
             with Session(self.engine) as session:
-                logging.info('Fetching data from stg_compound_structures table...')
-                statement = select(CompoundStructures).limit(400000)
+                logging.info('Fetching data from stg_compound_structures table')
+                statement = select(CompoundStructures)
                 results = session.exec(statement).all()
 
                 if not results:
@@ -51,7 +51,7 @@ class MorganFingerprintProcessor:
                 with Pool(cpu_count() // 2) as pool:
                     for batch_num, df_part in enumerate(
                             pool.imap(MorganFingerprintCalculator.process_fingerprints, df_splits)):
-                        logging.info(f'Processing and saving batch {batch_num}...')
+                        logging.info(f'Processing and saving batch {batch_num}')
 
                         # Save to S3
                         try:
