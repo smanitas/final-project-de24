@@ -15,11 +15,14 @@ This project sets up a data pipeline using Apache Airflow to process monthly CSV
 
 ## Project Structure
 
-- **ddl/**: Contains SQL scripts for setting up the Data Warehouse and staging schemas.
+- **dags/**: Directory containing Airflow DAG files.
+  - `monthly_similarity_processing_dag.py`: Airflow DAG for orchestrating the monthly similarity processing pipeline.
+    
+- **dags/ddl/**: Contains SQL scripts for setting up the Data Warehouse and staging schemas.
   - `dwh_ddl.sql`: SQL script for setting up the Data Warehouse schema.
   - `stg_ddl.sql`: SQL script for setting up the staging schema.
-  
-- **scripts/**: Contains Python scripts for data ingestion, processing, and similarity calculations.
+ 
+- **dags/scripts/**: Contains Python scripts for data ingestion, processing, and similarity calculations.
   - `aws.py`: Contains functions for interacting with AWS S3.
   - `chembl_data_ingestor.py`: Script for ingesting ChemBL data from the web service.
   - `config.py`: Configuration file with database and S3 settings.
@@ -30,19 +33,11 @@ This project sets up a data pipeline using Apache Airflow to process monthly CSV
   - `models.py`: Defines the database models using SQLModel.
   - `morgan_fingerprint_calculator.py`: Functions to calculate Morgan fingerprints.
   - `morgan_fingerprint_processor.py`: Processor for handling Morgan fingerprint data.
-  - `run_ingestor.py`: Script to run the ChemBL data ingestion process.
-  - `run_morgan_fingerprint.py`: Script to run the Morgan fingerprint processing.
-  - `run_tanimoto_similarity.py`: Script to run the Tanimoto similarity calculations.
+  - `run_ingestor.py`: Script to run the ChemBL data ingestion process (manually).
+  - `run_morgan_fingerprint.py`: Script to run the Morgan fingerprint processing (manually).
+  - `run_tanimoto_similarity.py`: Script to run the Tanimoto similarity calculations (manually).
   - `tanimoto_similarity_calculator.py`: Functions to calculate Tanimoto similarity scores.
   - `tanimoto_similarity_processor.py`: Processor for handling Tanimoto similarity data.
-  
-- **dags/**: Directory containing Airflow DAG files.
-  - `monthly_similarity_processing_dag.py`: Airflow DAG for orchestrating the monthly similarity processing pipeline.
-
-- **tests/**: Directory containing tests to cover the project code.
-  - Contains test scripts to ensure the correctness and reliability of the project's functionality.
-  
-- **docker-compose.yml**: Docker Compose configuration file to set up the Airflow environment.
 
 ## Prerequisites
 
@@ -68,13 +63,17 @@ psql -U postgres -f ddl/stg_ddl.sql
 
 ### Step 3: Configure Scripts
 
-Ensure your AWS and database credentials are correctly configured in scripts/config.py and scripts/config.yaml.
+Ensure your AWS and database credentials are correctly configured in scripts/config.yaml.
 
 ### Step 4: Run Data Ingestion Script
 
-Run the data ingestion script to fetch ChemBL data and insert it into the PostgreSQL database.
+Run the data ingestion script(_run_ingestor.py_) to fetch ChemBL data and insert it into the PostgreSQL database.
 
-### Step 5: Initialize Airflow
+### Step 5: Run Morgan fingerprints calculations
+
+Run the Morgan fingerprints script(_run_morgan_fingerprint.py_) to compute Morgan fingerprints for all compound structures.
+
+### Step 6: Initialize Airflow
 
 Run the following command to initialize the Airflow database:
 
@@ -82,7 +81,7 @@ Run the following command to initialize the Airflow database:
 docker-compose up airflow-init
 ```
 
-### Step 6: Start Airflow Services
+### Step 7: Start Airflow Services
 
 Start the Airflow services with Docker Compose:
 
@@ -90,12 +89,31 @@ Start the Airflow services with Docker Compose:
 docker-compose up -d
 ```
 
-### Step 7:  Access Airflow UI
+### Step 8:  Access Airflow UI
 
 Open your browser and navigate to http://localhost:8080 to access the Airflow web interface.
 
+### Step 9:  Setup AWS sonnection
 
-### Step 8:  Run the Pipeline
+Add a new connection "aws_default" with your AWS credentials (required for the S3KeySensor).
 
-The pipeline will automatically run on the first day of each month. If any task fails, an email notification will be sent to the configured email address.
+NB! The "tanimoto_similarity_processor.py" script currently uses credentials from config.yaml. This should be updated to take credentials from Airflow itself.
 
+### Step 10:  Run the Pipeline
+
+The pipeline will automatically run on the first day of each month. If any task fails, an email notification will be sent to the configured email address. Ensure that you provide all the needed credentials for that feature.
+
+## Examples
+
+#### Example of DAG Execution
+_Description: Screenshot of Airflow successfully completing the DAG execution for the monthly similarity processing._
+
+<img src="https://github.com/smanitas/final-project-de24/assets/101178295/33bbbab9-1def-4f2a-9afc-0897e72678ae" alt="airflow" width="500"/>
+
+#### Examples of Fact table with molecule similarities and Dimension table with molecules and their properties
+
+**Fact Table:**
+<img src="https://github.com/smanitas/final-project-de24/assets/101178295/b4661668-67b9-4732-925b-9a8d170b63e1" alt="fact_table" width="500"/>
+
+**Dimension Table:**
+<img src="https://github.com/smanitas/final-project-de24/assets/101178295/e113a0a6-7062-4278-891b-382442d90dc9" alt="dim_table" width="500"/>
